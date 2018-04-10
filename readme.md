@@ -79,7 +79,7 @@ Type: `Array`
 Array of `RegExp` instances seperated by `/`. This can be usable when working with paths or urls. 
 
 Example array could be:
-```
+```js
 [ /^foo$/, /^bar$/, /^([^\/]*)$/, '^baz\\.(md|js|txt)$' ]
 ```
 
