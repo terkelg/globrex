@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/terkelg/eliminate/raw/master/globrex.png" alt="globrex" width="500" height="100" />
+  <img src="https://github.com/terkelg/globrex/raw/master/globrex.png" alt="globrex" width="500" height="200" />
 </div>
 
 <h1 align="center">globrex</h1>
@@ -146,7 +146,7 @@ This is how bash-globbing works.
 Type: `String`<br>
 Default: `''`
 
-RegExp flags (eg `'i'` ) to pass in to RegExp constructor.
+RegExp flags (e.g. `'i'` ) to pass to the RegExp constructor.
 
 ## License
 
