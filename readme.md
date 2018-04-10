@@ -16,7 +16,7 @@
   </a>
 </div>
 
-<div align="center">Simple but powerful glob to regex compiler.</div>
+<div align="center">Simple but powerful glob to regular expression compiler.</div>
 
 <br />
 
@@ -24,8 +24,15 @@
 ## Installation
 
 ```
-npm install globrex
+npm install globrex --save
 ```
+
+
+## Core Features
+
+- **extended globbing:** transform advance `ExtGlob` features
+- **simple**: no dependencies
+- **paths**: split paths into multiple `RegExp` segments
 
 
 ## Usage
@@ -41,13 +48,6 @@ regex.test('puck'); // true
 
 
 ## API
-
-This package support all advanced features from `extglob`.
-To lean more about globbing look here:
-
-- [mywiki.wooledge.org/glob](http://mywiki.wooledge.org/glob)
-- [linuxjournal](http://www.linuxjournal.com/content/bash-extended-globbing)
-
 
 ## globrex(glob, opts)
 
@@ -106,9 +106,9 @@ Configuration object, that enables/disable different features.
 Type: `Boolean`<br>
 Default: `false`
 
-Whether we are matching so called "extended" globs (like bash) and should
-support single character matching, matching ranges of characters, group
-matching, etc.
+Enable all advanced features from `extglob`.
+
+Matching so called "extended" globs pattern like single character matching, matching ranges of characters, group matching, etc.
 
 > **Note**: Interprets `[a-d]` as `[abcd]`.  To match a literal `-`, include it as first or last character.
 
@@ -147,6 +147,14 @@ Type: `String`<br>
 Default: `''`
 
 RegExp flags (e.g. `'i'` ) to pass to the RegExp constructor.
+
+
+## References
+
+Learn more about globbing here:
+- [mywiki.wooledge.org/glob](http://mywiki.wooledge.org/glob)
+- [linuxjournal](http://www.linuxjournal.com/content/bash-extended-globbing)
+
 
 ## License
 
