@@ -5,13 +5,14 @@ module.exports = globrex;
 /**
  * Convert any glob pattern to a JavaScript Regexp object
  * @param {String} glob Glob pattern to convert
- * @param {Object} options Configuration object
- * @returns {RegExp} converted RegExp object
+ * @param {Object} opts Configuration object
+ * @param {Boolean} [opts.extended=false] Support advanced ext globbing
+ * @param {Boolean} [opts.globstar=false] Support globstar
+ * @param {Boolean} [opts.strict=true] be laissez faire about mutiple slashes
+ * @param {String} [opts.flags=''] RegExp globs
+ * @returns {Object} converted object with string, segments and RegExp object
  */
 function globrex(glob, { extended = false, globstar = false, strict = false, flags = ''} = {}) {
-    let str = String(glob);
-
-    // The regexp we are building, as a string.
     let reStr = '';
 
     // The individual path segments - array of regexp for each segment in a path
@@ -43,9 +44,9 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fla
 
     let c  // current char
     let n; // next char
-    for (var i = 0, len = str.length; i < len; i++) {
-        c = str[i];
-        n = str[i + 1] || null;
+    for (var i = 0, len = glob.length; i < len; i++) {
+        c = glob[i];
+        n = glob[i + 1] || null;
 
         switch (c) {
             case '\\':
@@ -137,7 +138,7 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fla
                 if (inRange && n === ':') {
                     i++; // skip [
                     let value = '';
-                    while(str[++i] !== ':') value += str[i];
+                    while(glob[++i] !== ':') value += glob[i];
                     if (value === 'alnum') add('(\\w|\\d)');
                     else if (value === 'space') add('\\s');
                     else if (value === 'digit') add('\\d');
@@ -187,13 +188,13 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fla
 
                 // Move over all consecutive "*"'s.
                 // Also store the previous and next characters
-                let prevChar = str[i - 1];
+                let prevChar = glob[i - 1];
                 let starCount = 1;
-                while (str[i + 1] === '*') {
+                while (glob[i + 1] === '*') {
                     starCount++;
                     i++;
                 }
-                let nextChar = str[i + 1];
+                let nextChar = glob[i + 1];
 
                 if (!globstar) {
                     // globstar is disabled, so treat any number of "*" as one
@@ -228,13 +229,8 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fla
         segment = `^${segment}$`;
     }
 
-    // Push the last segment / the rest
+    // Push the last segment
     segments.push(new RegExp(segment, flags));
-    /*
-    if (pathsegments) {
-        return { segments, full: new RegExp(reStr, flags) }
-    }
-    */
 
     return { regex: new RegExp(reStr, flags), string: reStr, segments };
 }
