@@ -1,18 +1,17 @@
 {
   "name": "globrex",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Glob to regex",
   "main": "src/index.js",
   "author": "Terkel Gjervig",
   "license": "MIT",
-  "repository": "terkelg/globrex",
-  "files": [
-    "src"
-  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/terkelg/globrex"
   },
+  "files": [
+    "src"
+  ],
   "keywords": [
     "glob",
     "regex",
