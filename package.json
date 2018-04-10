@@ -1,0 +1,31 @@
+{
+  "name": "globrex",
+  "version": "0.0.0",
+  "description": "Glob to regex",
+  "main": "src/index.js",
+  "author": "Terkel Gjervig",
+  "license": "MIT",
+  "repository": "terkelg/globrex",
+  "files": [
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/terkelg/globrex"
+  },
+  "keywords": [
+    "glob",
+    "regex",
+    "regexp",
+    "parser",
+    "glob2regx",
+    "compiler"
+  ],
+  "scripts": {
+    "test": "tape test/*.js | tap-spec"
+  },
+  "devDependencies": {
+    "tap-spec": "^4.1.1",
+    "tape": "^4.8.0"
+  }
+}
