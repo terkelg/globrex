@@ -40,10 +40,10 @@ npm install globrex --save
 ```js
 const globrex = require('globrex');
 
-const { regex } = globrex('p*uck');
-regex.test('pot luck'); // true
-regex.test('pluck'); // true
-regex.test('puck'); // true
+const result = globrex('p*uck')
+// => { regex: /^p.*uck$/, string: '^p.*uck$', segments: [ /^p.*uck$/ ] }
+
+result.regex.test('pluck'); // true
 ```
 
 
@@ -54,7 +54,7 @@ regex.test('puck'); // true
 Type: `function`<br>
 Returns: `{ regex, string, segments }`
 
-Transform glob strings into regex.
+Transform globs intp regular expressions.
 Returns object with the following properties:
 
 #### obj.regex
@@ -76,7 +76,8 @@ Regex string representation of the glob.
 
 Type: `Array`
 
-Array of `RegExp` instances seperated by `/`. This can be usable when working with paths or urls. 
+Array of `RegExp` instances seperated by `/`. 
+This can be usable when working with paths or urls. 
 
 Example array could be:
 ```js
@@ -118,15 +119,11 @@ Matching so called "extended" globs pattern like single character matching, matc
 Type: `Boolean`<br>
 Default: `false`
 
-When globstar is `false` the `'/foo/*'` is translated a regexp like
+When globstar is `false` globs like `'/foo/*'` are transformed to the following
 `'^\/foo\/.*$'` which will match any string beginning with `'/foo/'`.
 
-When globstar is `true`, `'/foo/*'` is translated to regexp like
-`'^\/foo\/[^/]*$'` which will match any string beginning with `'/foo/'` BUT
-which **does not have** a `'/'` to the right of it.
-
-E.g. with `'/foo/*'` these will match: `'/foo/bar'`, `'/foo/bar.txt'` but
-these will not `'/foo/bar/baz'`, `'/foo/bar/baz.txt'`
+When the globstar option is `true`, the same `'/foo/*'` glob is transformed to
+`'^\/foo\/[^/]*$'` which will match any string beginning with `'/foo/'` that **does not have** a `'/'` to the right of it. `'/foo/*'` will match: `'/foo/bar'`, `'/foo/bar.txt'` but not `'/foo/bar/baz'` or `'/foo/bar/baz.txt'.
 
 > **Note**: When globstar is `true`, `'/foo/**'` is equivelant to `'/foo/*'` when globstar is `false`.
 
@@ -136,9 +133,7 @@ these will not `'/foo/bar/baz'`, `'/foo/bar/baz.txt'`
 Type: `Boolean`<br>
 Default: `false`
 
-Don't be so strict.
-Be forgiving about `///` and make everything after the first `/` optional.
-This is how bash-globbing works.
+Be forgiving about mutiple slashes, like `///` and make everything after the first `/` optional. This is how bash glob works.
 
 
 #### opts.flags
