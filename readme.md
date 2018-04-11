@@ -123,7 +123,7 @@ When globstar is `false` globs like `'/foo/*'` are transformed to the following
 `'^\/foo\/.*$'` which will match any string beginning with `'/foo/'`.
 
 When the globstar option is `true`, the same `'/foo/*'` glob is transformed to
-`'^\/foo\/[^/]*$'` which will match any string beginning with `'/foo/'` that **does not have** a `'/'` to the right of it. `'/foo/*'` will match: `'/foo/bar'`, `'/foo/bar.txt'` but not `'/foo/bar/baz'` or `'/foo/bar/baz.txt'.
+`'^\/foo\/[^/]*$'` which will match any string beginning with `'/foo/'` that **does not have** a `'/'` to the right of it. `'/foo/*'` will match: `'/foo/bar'`, `'/foo/bar.txt'` but not `'/foo/bar/baz'` or `'/foo/bar/baz.txt'`.
 
 > **Note**: When globstar is `true`, `'/foo/**'` is equivelant to `'/foo/*'` when globstar is `false`.
 
