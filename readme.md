@@ -49,7 +49,7 @@ result.regex.test('pluck'); // true
 
 ## API
 
-## globrex(glob, opts)
+### globrex(glob, options)
 
 Type: `function`<br>
 Returns: `{ regex, string, segments }`
@@ -57,7 +57,7 @@ Returns: `{ regex, string, segments }`
 Transform globs intp regular expressions.
 Returns object with the following properties:
 
-#### obj.regex
+#### regex
 
 Type: `RegExp`
 
@@ -66,13 +66,13 @@ JavaScript `RegExp` instance.
 > **Note**: Read more about how to use [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) on MDN.
 
 
-#### obj.string
+#### string
 
 Type: `String`
 
 Regex string representation of the glob. 
 
-#### obj.segments
+#### segments
 
 Type: `Array`
 
@@ -94,15 +94,7 @@ Type: `String`
 Glob string to transform.
 
 
-#### opts
-
-Type: `Object`<br>
-Default: `{ extended: false, globstar: false, strict: false, flags: '' }`
-
-Configuration object, that enables/disable different features.
-
-
-#### opts.extended
+### options.extended
 
 Type: `Boolean`<br>
 Default: `false`
@@ -114,7 +106,7 @@ Matching so called "extended" globs pattern like single character matching, matc
 > **Note**: Interprets `[a-d]` as `[abcd]`.  To match a literal `-`, include it as first or last character.
 
 
-#### opts.globstar
+### options.globstar
 
 Type: `Boolean`<br>
 Default: `false`
@@ -128,7 +120,7 @@ When the globstar option is `true`, the same `'/foo/*'` glob is transformed to
 > **Note**: When globstar is `true`, `'/foo/**'` is equivelant to `'/foo/*'` when globstar is `false`.
 
 
-#### opts.strict
+### options.strict
 
 Type: `Boolean`<br>
 Default: `false`
@@ -136,7 +128,7 @@ Default: `false`
 Be forgiving about mutiple slashes, like `///` and make everything after the first `/` optional. This is how bash glob works.
 
 
-#### opts.flags
+### options.flags
 
 Type: `String`<br>
 Default: `''`
@@ -146,7 +138,7 @@ RegExp flags (e.g. `'i'` ) to pass to the RegExp constructor.
 
 ## References
 
-Learn more about globbing here:
+Learn more about advanced globbing here
 - [mywiki.wooledge.org/glob](http://mywiki.wooledge.org/glob)
 - [linuxjournal](http://www.linuxjournal.com/content/bash-extended-globbing)
 
