@@ -21,7 +21,7 @@
 <br />
 
 
-## Installation
+## Install
 
 ```
 npm install globrex --save
