@@ -136,6 +136,14 @@ Default: `''`
 RegExp flags (e.g. `'i'` ) to pass to the RegExp constructor.
 
 
+### options.windows
+
+Type: `Boolean`<br>
+Default: `System OS`
+
+Split segment as a windows path, otherwise splut as unix. Defaults to the OS running the package.
+
+
 ## References
 
 Learn more about advanced globbing here

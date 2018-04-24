@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = globrex;
+const isWin = require('os').platform() === 'win32';
 
 /**
  * Convert any glob pattern to a JavaScript Regexp object
@@ -10,9 +8,10 @@ module.exports = globrex;
  * @param {Boolean} [opts.globstar=false] Support globstar
  * @param {Boolean} [opts.strict=true] be laissez faire about mutiple slashes
  * @param {String} [opts.flags=''] RegExp globs
+ * @param {String} [opts.windows] Set to true to split path as a windows path. Defaults to OS.
  * @returns {Object} converted object with string, segments and RegExp object
  */
-function globrex(glob, { extended = false, globstar = false, strict = false, flags = ''} = {}) {
+function globrex(glob, { extended = false, globstar = false, strict = false, flags = '', windows = isWin} = {}) {
     let reStr = '';
 
     // The individual path segments - array of regexp for each segment in a path
@@ -24,10 +23,10 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fla
         reStr += str;
         if (split) {
             if (addLastPart) segment += str;
-            if (!flags || !~flags.indexOf('g')) {
-                segment = `^${segment}$`;
+            if (segment !== '') {
+                if (!flags || !~flags.indexOf('g')) segment = `^${segment}$`;
+                segments.push(new RegExp(segment, flags));
             }
-            segments.push(new RegExp(segment, flags));
             segment = '';
         } else {
             segment += str;
@@ -47,21 +46,21 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fla
     for (var i = 0, len = glob.length; i < len; i++) {
         c = glob[i];
         n = glob[i + 1] || null;
-
         switch (c) {
-            case '\\':
             case '$':
             case '^':
             case '.':
             case '=':
                 add('\\' + c)
                 break;
-
-            case '/':
-                add('\\' + c, true);
-                if (n === '/' && !strict) reStr += '?'; // this is not relevant for segments
+            case '\\':
+                add('\\' + c, windows);
+                if (n === '\\' && !strict) reStr += '?';
                 break;
-
+            case '/':
+                add('\\' + c, !windows);
+                if (n === '/' && !strict) reStr += '?'; 
+                break;
             case '(':
                 if (ext.length) {
                     add(c);
@@ -69,7 +68,6 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fla
                 }
                 add('\\' + c);
                 break;
-
             case ')':
                 if (ext.length) {
                     add(c);
@@ -85,7 +83,6 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fla
                 }
                 add('\\' + c);
                 break;
-
             case '|':
                 if (ext.length) {
                     add(c);
@@ -93,7 +90,6 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fla
                     add('\\' + c);
                 }
                 break;
-
             case '+':
                 if (n === '(' && extended) {
                     ext.push(c);
@@ -101,13 +97,11 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fla
                     add('\\' + c);
                 }
                 break;
-
             case '@':
                 if (n === '(' && extended) {
                     ext.push(c);
                     break;
                 }
-
             case '!':
                 if (extended) {
                     if (inRange) {
@@ -123,7 +117,6 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fla
                     add('\\' + c);
                     break;
                 }
-
             case '?':
                 if (extended) {
                     if (n === '(') {
@@ -133,7 +126,6 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fla
                     }
                     break;
                 }
-
             case '[':
                 if (inRange && n === ':') {
                     i++; // skip [
@@ -150,28 +142,24 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fla
                     add(c);
                     break;
                 }
-
             case ']':
                 if (extended) {
                     inRange = false;
                     add(c);
                     break;
                 }
-
             case '{':
                 if (extended) {
                     inGroup = true;
                     add('(');
                     break;
                 }
-
             case '}':
                 if (extended) {
                     inGroup = false;
                     add(')');
                     break;
                 }
-
             case ',':
                 if (inGroup) {
                     add('|');
@@ -179,13 +167,11 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fla
                 }
                 add('\\' + c);
                 break;
-
             case '*':
                 if (n === '(' && extended) {
                     ext.push(c);
                     break;
                 }
-
                 // Move over all consecutive "*"'s.
                 // Also store the previous and next characters
                 let prevChar = glob[i - 1];
@@ -195,7 +181,6 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fla
                     i++;
                 }
                 let nextChar = glob[i + 1];
-
                 if (!globstar) {
                     // globstar is disabled, so treat any number of "*" as one
                     add('.*');
@@ -205,7 +190,6 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fla
                         starCount > 1 && // multiple "*"'s
                         (prevChar === '/' || prevChar === undefined) && // from the start of the segment
                         (nextChar === '/' || nextChar === undefined); // to the end of the segment
-
                     if (isGlobstar) {
                         // it's a globstar, so match zero or more path segments
                         add('((?:[^/]*(?:/|$))*)', true, true)
@@ -216,7 +200,6 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fla
                     }
                 }
                 break;
-
             default:
                 add(c);
         }
@@ -234,3 +217,5 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fla
 
     return { regex: new RegExp(reStr, flags), string: reStr, segments };
 }
+
+module.exports = globrex;
