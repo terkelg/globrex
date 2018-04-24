@@ -1,6 +1,6 @@
 {
   "name": "globrex",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Glob to regex",
   "main": "src/index.js",
   "author": "Terkel Gjervig",
