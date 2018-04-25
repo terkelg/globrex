@@ -4,7 +4,7 @@ const test = require('tape');
 const fs = require('fs');
 const globrex = require('../');
 
-const g = (glob, str, opts) => globrex(glob, opts).regex.test(str);
+const g = (glob, str, opts) => globrex(glob, {windows:false, ...opts}).regex.test(str);
 
 test('globrex: standard', t => {
     t.plan(5);
@@ -346,40 +346,41 @@ test('globrex: strict', t => {
 
 test('globrex: path segments option', t => {
     t.plan(18);
+    const opts = { extended:true, windows:false };
 
-    const res1 = globrex('foo/bar/*/baz.{md,js,txt}', { extended:true, globstar:true });
+    const res1 = globrex('foo/bar/*/baz.{md,js,txt}', { ...opts, globstar:true });
     t.equal(res1.segments.join('  '), `/^foo$/  /^bar$/  /^([^\\/]*)$/  /^baz\\.(md|js|txt)$/`)
     t.equal(`${res1.regex}`, `/^foo\\/bar\\/([^\\/]*)\\/baz\\.(md|js|txt)$/`)
 
-    const res2 = globrex('foo/*/baz.md', { extended:true });
+    const res2 = globrex('foo/*/baz.md', opts);
     t.equal(res2.segments.join('  '), `/^foo$/  /^.*$/  /^baz\\.md$/`);
     t.equal(`${res2.regex}`, `/^foo\\/.*\\/baz\\.md$/`);
 
-    const res3 = globrex('foo/**/baz.md', { extended:true });
+    const res3 = globrex('foo/**/baz.md', opts);
     t.equal(res3.segments.join('  '), `/^foo$/  /^.*$/  /^baz\\.md$/`);
     t.equal(`${res3.regex}`, `/^foo\\/.*\\/baz\\.md$/`);
 
-    const res4 = globrex('foo/**/baz.md', { extended:true, globstar:true });
+    const res4 = globrex('foo/**/baz.md', { ...opts, globstar:true });
     t.equal(res4.segments.join('  '), `/^foo$/  /^((?:[^\\/]*(?:\\/|$))*)$/  /^baz\\.md$/`);
     t.equal(`${res4.regex}`, `/^foo\\/((?:[^\\/]*(?:\\/|$))*)baz\\.md$/`);
 
-    const res5 = globrex('foo/**/*.md', { extended:true });
+    const res5 = globrex('foo/**/*.md', opts);
     t.equal(res5.segments.join('  '), `/^foo$/  /^.*$/  /^.*\\.md$/`);
     t.equal(`${res5.regex}`, `/^foo\\/.*\\/.*\\.md$/`);
 
-    const res6 = globrex('foo/**/*.md', { extended:true, globstar:true });
+    const res6 = globrex('foo/**/*.md', { ...opts, globstar:true });
     t.equal(res6.segments.join('  '), `/^foo$/  /^((?:[^\\/]*(?:\\/|$))*)$/  /^([^\\/]*)\\.md$/`);
     t.equal(`${res6.regex}`, `/^foo\\/((?:[^\\/]*(?:\\/|$))*)([^\\/]*)\\.md$/`);
 
-    const res7 = globrex('foo/:/b:az', { extended:true });
+    const res7 = globrex('foo/:/b:az',  opts);
     t.equal(res7.segments.join('  '), `/^foo$/  /^:$/  /^b:az$/`);
     t.equal(`${res7.regex}`, `/^foo\\/:\\/b:az$/`);
 
-    const res8 = globrex('foo///baz.md', { extended:true, strict:true });
+    const res8 = globrex('foo///baz.md', { ...opts, strict:true });
     t.equal(res8.segments.join('  '), `/^foo$/  /^baz\\.md$/`);
     t.equal(`${res8.regex}`, `/^foo\\/\\/\\/baz\\.md$/`);
 
-    const res9 = globrex('foo///baz.md', { extended:true, strict:false });
+    const res9 = globrex('foo///baz.md', { ...opts, strict:false });
     t.equal(res9.segments.join('  '), `/^foo$/  /^baz\\.md$/`);
     t.equal(`${res9.regex}`, `/^foo\\/?\\/?\\/baz\\.md$/`);
 });
