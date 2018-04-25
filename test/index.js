@@ -4,7 +4,7 @@ const test = require('tape');
 const fs = require('fs');
 const globrex = require('../');
 
-const g = (glob, str, opts) => globrex(glob, {windows:false, ...opts}).regex.test(str);
+const g = (glob, str, opts) => globrex(glob, opts).regex.test(str);
 
 test('globrex: standard', t => {
     t.plan(5);

@@ -11,6 +11,9 @@
   <a href="https://travis-ci.org/terkelg/globrex">
     <img src="https://img.shields.io/travis/terkelg/globrex.svg" alt="travis" />
   </a>
+  <a href="https://ci.appveyor.com/project/terkelg/globrex">
+    <img src="https://ci.appveyor.com/api/projects/status/ecbnb3whibj5iqcj?svg=true" alt="appveyor" />
+  </a>
   <a href="https://npmjs.org/package/globrex">
     <img src="https://img.shields.io/npm/dm/globrex.svg" alt="downloads" />
   </a>
