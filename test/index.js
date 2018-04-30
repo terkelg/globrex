@@ -11,7 +11,7 @@ function match(t, pattern, ifUnix, ifWin, opts) {
    console.log(res);
    console.log(regex);
    t.is(regex.toString(), isWin ? ifWin : ifUnix, '~> regex matches expectant');
-   return regex;
+   return res;
 }
 
 test('globrex: standard', t => {
@@ -355,7 +355,11 @@ test('globrex: strict', t => {
 test('globrex: filepath path-regex', t => {
    let opts = { extended:true, filepath:true };
 
-   match(t, 'foo/bar/baz.js', '/^foo\\/bar\\/baz\\.js$/', '/^foo\\\\+bar\\\\+baz\\.js$/', opts);
+   let res = match(t, 'foo/bar/baz.js', '/^foo\\/bar\\/baz\\.js$/', '/^foo\\\\+bar\\\\+baz\\.js$/', opts);
+   t.is(`${res.regex}`, '/^foo\\/bar\\/baz\\.js$/');
+
+   // TEST STAR PATTERN
+   // UPDATE README
 
    t.end(); 
 })

@@ -189,11 +189,11 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fil
                         (nextChar === '/' || nextChar === undefined); // to the end of the segment
                     if (isGlobstar) {
                         // it's a globstar, so match zero or more path segments
-                        add('((?:[^/]*(?:/|$))*)', true, true)
+                        add(`((?:[^${SEP}]*(?:${SEP}|$))*)`, true, true)
                         i++; // move over the "/"
                     } else {
                         // it's not a globstar, so only match one path segment
-                        add('([^/]*)');
+                        add(`([^${SEP}]*)`);
                     }
                 }
                 break;
