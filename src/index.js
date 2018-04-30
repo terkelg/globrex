@@ -1,5 +1,5 @@
 const isWin = process.platform === 'win32';
-const SEP = isWin ? '\\\\+' : '\/'
+const SEP = isWin ? '\\\\+' : '\\/'
 
 /**
  * Convert any glob pattern to a JavaScript Regexp object
@@ -28,7 +28,7 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fil
     const add = (str, split, addLastPart) => {
         regex += str;
         if (filepath) {
-            path.regex += str === '/' ? SEP : str;
+            path.regex += str === '\\/' ? SEP : str;
             if (split) {
                 if (addLastPart) segment += str;
                 if (segment !== '') {
