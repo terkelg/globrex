@@ -26,9 +26,9 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fil
 
     // Helper function to build string and segments
     const add = (str, split, addLastPart) => {
-        regex += str === '/' ? SEP : str;
+        regex += str;
         if (filepath) {
-            path.regex += str;
+            path.regex += str === '/' ? SEP : str;
             if (split) {
                 if (addLastPart) segment += str;
                 if (segment !== '') {
