@@ -1,5 +1,5 @@
 const isWin = process.platform === 'win32';
-const SEP = isWin ? '\\' : '/';
+const SEP_ESC = isWin ? '\\\\' : '/';
 const SEP_RGX = isWin ? '\\\\+' : '\\/';
 
 /**
@@ -9,6 +9,7 @@ const SEP_RGX = isWin ? '\\\\+' : '\\/';
  * @param {Boolean} [opts.extended=false] Support advanced ext globbing
  * @param {Boolean} [opts.globstar=false] Support globstar
  * @param {Boolean} [opts.strict=true] be laissez faire about mutiple slashes
+ * @param {Boolean} [opts.filepath=''] Parse as filepath for extra path related features
  * @param {String} [opts.flags=''] RegExp globs
  * @returns {Object} converted object with string, segments and RegExp object
  */
@@ -190,11 +191,11 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fil
                         (nextChar === '/' || nextChar === undefined); // to the end of the segment
                     if (isGlobstar) {
                         // it's a globstar, so match zero or more path segments
-                        add(`((?:[^${SEP}]*(?:${SEP}|$))*)`, true, true)
+                        add(`((?:[^${SEP_ESC}]*(?:${SEP_ESC}|$))*)`, true, true)
                         i++; // move over the "/"
                     } else {
                         // it's not a globstar, so only match one path segment
-                        add(`([^${SEP}]*)`);
+                        add(`([^${SEP_ESC}]*)`);
                     }
                 }
                 break;
