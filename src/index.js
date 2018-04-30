@@ -1,4 +1,4 @@
-const isWin = require('os').platform() === 'win32';
+const isWin = process.platform === 'win32';
 
 /**
  * Convert any glob pattern to a JavaScript Regexp object
@@ -8,19 +8,27 @@ const isWin = require('os').platform() === 'win32';
  * @param {Boolean} [opts.globstar=false] Support globstar
  * @param {Boolean} [opts.strict=true] be laissez faire about mutiple slashes
  * @param {String} [opts.flags=''] RegExp globs
- * @param {String} [opts.windows] Set to true to split path as a windows path. Defaults to OS.
  * @returns {Object} converted object with string, segments and RegExp object
  */
-function globrex(glob, { extended = false, globstar = false, strict = false, flags = '', windows = isWin} = {}) {
-    let reStr = '';
+function globrex(glob, { extended = false, globstar = false, strict = false, filepath = false, flags = '' } = {}) {
+    let regex = '';
+    let regexPath = '';
 
     // The individual path segments - array of regexp for each segment in a path
     let segment = '';
     let segments = [];
 
+    // If we are doing extended matching, this boolean is true when we are inside
+    // a group (eg {*.html,*.js}), and false otherwise.
+    let inGroup = false;
+    let inRange = false;
+
+    // extglob stack. Keep track of scope
+    const ext = [];
+
     // Helper function to build string and segments
     const add = (str, split, addLastPart) => {
-        reStr += str;
+        regex += str;
         if (split) {
             if (addLastPart) segment += str;
             if (segment !== '') {
@@ -33,33 +41,21 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fla
         }
     }
 
-    // If we are doing extended matching, this boolean is true when we are inside
-    // a group (eg {*.html,*.js}), and false otherwise.
-    let inGroup = false;
-    let inRange = false;
-
-    // extglob sign "call stack". Keep track of "scope"
-    const ext = [];
-
-    let c  // current char
-    let n; // next char
+    let c, n;
     for (var i = 0, len = glob.length; i < len; i++) {
         c = glob[i];
-        n = glob[i + 1] || null;
+        n = glob[i + 1];
         switch (c) {
+            case '\\':
             case '$':
             case '^':
             case '.':
             case '=':
                 add('\\' + c)
                 break;
-            case '\\':
-                add('\\' + c, windows);
-                if (n === '\\' && !strict) reStr += '?';
-                break;
             case '/':
-                add('\\' + c, !windows);
-                if (n === '/' && !strict) reStr += '?'; 
+                add('\\' + c, true);
+                if (n === '/' && !strict) regex += '?'; 
                 break;
             case '(':
                 if (ext.length) {
@@ -208,14 +204,14 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fla
     // When regexp 'g' flag is specified don't
     // constrain the regular expression with ^ & $
     if (!flags || !~flags.indexOf('g')) {
-        reStr = `^${reStr}$`;
+        regex = `^${regex}$`;
         segment = `^${segment}$`;
     }
 
     // Push the last segment
     segments.push(new RegExp(segment, flags));
 
-    return { regex: new RegExp(reStr, flags), string: reStr, segments };
+    return { regex: new RegExp(regex, flags), string: regex, segments };
 }
 
 module.exports = globrex;
