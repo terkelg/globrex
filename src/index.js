@@ -1,4 +1,5 @@
 const isWin = process.platform === 'win32';
+const SEP = isWin ? '\\\\+' : '\/'
 
 /**
  * Convert any glob pattern to a JavaScript Regexp object
@@ -12,11 +13,8 @@ const isWin = process.platform === 'win32';
  */
 function globrex(glob, { extended = false, globstar = false, strict = false, filepath = false, flags = '' } = {}) {
     let regex = '';
-    let regexPath = '';
-
-    // The individual path segments - array of regexp for each segment in a path
     let segment = '';
-    let segments = [];
+    let path = { regex: '', segments: [] };
 
     // If we are doing extended matching, this boolean is true when we are inside
     // a group (eg {*.html,*.js}), and false otherwise.
@@ -28,16 +26,19 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fil
 
     // Helper function to build string and segments
     const add = (str, split, addLastPart) => {
-        regex += str;
-        if (split) {
-            if (addLastPart) segment += str;
-            if (segment !== '') {
-                if (!flags || !~flags.indexOf('g')) segment = `^${segment}$`;
-                segments.push(new RegExp(segment, flags));
+        regex += str === '/' ? SEP : str;
+        if (filepath) {
+            path.regex += str;
+            if (split) {
+                if (addLastPart) segment += str;
+                if (segment !== '') {
+                    if (!flags || !~flags.indexOf('g')) segment = `^${segment}$`;
+                    path.segments.push(new RegExp(segment, flags));
+                }
+                segment = '';
+            } else {
+                segment += str;
             }
-            segment = '';
-        } else {
-            segment += str;
         }
     }
 
@@ -55,7 +56,7 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fil
                 break;
             case '/':
                 add('\\' + c, true);
-                if (n === '/' && !strict) regex += '?'; 
+                if (n === '/' && !strict) regex += '?'; //TODO test with win
                 break;
             case '(':
                 if (ext.length) {
@@ -206,12 +207,16 @@ function globrex(glob, { extended = false, globstar = false, strict = false, fil
     if (!flags || !~flags.indexOf('g')) {
         regex = `^${regex}$`;
         segment = `^${segment}$`;
+        if (filepath) path.regex = `^${path.regex}$`;
     }
 
     // Push the last segment
-    segments.push(new RegExp(segment, flags));
+    if (filepath) {
+        path.segments.push(new RegExp(segment, flags));
+        path.regex = new RegExp(path.regex, flags);
+    }
 
-    return { regex: new RegExp(regex, flags), string: regex, segments };
+    return { regex: new RegExp(regex, flags), path };
 }
 
 module.exports = globrex;
