@@ -11,14 +11,23 @@ function match(glob, strUnix, strWin, opts = {}) {
       strWin = false;
    }
    let res = globrex(glob, opts);
-   console.log(res, strUnix);
    return res.regex.test(isWin && strWin ? strWin : strUnix);
 }
 
 function matchRegex(t, pattern, ifUnix, ifWin, opts) {
-   let res = globrex(pattern, opts);
-   let { regex } = (opts.filepath ? res.path : res);
+   const res = globrex(pattern, opts);
+   const {regex} = (opts.filepath ? res.path : res);
    t.is(regex.toString(), isWin ? ifWin : ifUnix, '~> regex matches expectant');
+   return res;
+}
+
+function matchSegments(t, pattern, ifUnix, ifWin, opts) {
+   const res = globrex(pattern, {filepath:true, ...opts});
+   const str = res.path.segments.join(' ');
+   const exp = (isWin ? ifWin : ifUnix).join(' ');
+   console.log(exp, str);
+   t.is(str, exp);
+   // TODO: Move to utils
    return res;
 }
 
@@ -387,43 +396,43 @@ test('globrex: filepath path-regex', t => {
 })
 
 test('globrex: filepath path segments', t => {
-   let opts = { extended:true, filepath:true }, res;
+   let opts = { extended:true }, res, win, unix;
 
-   res = globrex('foo/bar/*/baz.{md,js,txt}', { ...opts, globstar:true });
-   t.equal(res.path.segments.join('  '), `/^foo$/  /^bar$/  /^([^\\/]*)$/  /^baz\\.(md|js|txt)$/`);
-   //t.equal(`${res.regex}`, `/^foo\\/bar\\/([^\\/]*)\\/baz\\.(md|js|txt)$/`);
+   unix = [/^foo$/, /^bar$/, /^([^\/]*)$/, /^baz\.(md|js|txt)$/];
+   win = [];
+   matchSegments(t, 'foo/bar/*/baz.{md,js,txt}', unix, win, {...opts, globstar:true});
 
-   res = globrex('foo/*/baz.md', opts);
-   t.equal(res.path.segments.join('  '), `/^foo$/  /^.*$/  /^baz\\.md$/`);
-   //t.equal(`${res.regex}`, `/^foo\\/.*\\/baz\\.md$/`);
+   unix = [/^foo$/, /^.*$/, /^baz\.md$/];
+   win = [];
+   matchSegments(t, 'foo/*/baz.md', unix, win, opts);
+   
+   unix = [/^foo$/, /^.*$/, /^baz\.md$/];
+   win = [];
+   matchSegments(t, 'foo/**/baz.md', unix, win, opts);
 
-   res = globrex('foo/**/baz.md', opts);
-   t.equal(res.path.segments.join('  '), `/^foo$/  /^.*$/  /^baz\\.md$/`);
-   //t.equal(`${res.regex}`, `/^foo\\/.*\\/baz\\.md$/`);
+   unix = [/^foo$/, /^((?:[^\/]*(?:\/|$))*)$/, /^baz\.md$/];
+   win = [];
+   matchSegments(t, 'foo/**/baz.md', unix, win, {...opts, globstar:true});
 
-   res = globrex('foo/**/baz.md', { ...opts, globstar:true });
-   t.equal(res.path.segments.join('  '), `/^foo$/  /^((?:[^\\/]*(?:\\/|$))*)$/  /^baz\\.md$/`);
-   //t.equal(`${res.regex}`, `/^foo\\/((?:[^\\/]*(?:\\/|$))*)baz\\.md$/`);
+   unix = [/^foo$/, /^.*$/, /^.*\.md$/];
+   win = [];
+   matchSegments(t, 'foo/**/*.md', unix, win, opts);
 
-   res = globrex('foo/**/*.md', opts);
-   t.equal(res.path.segments.join('  '), `/^foo$/  /^.*$/  /^.*\\.md$/`);
-   //t.equal(`${res.regex}`, `/^foo\\/.*\\/.*\\.md$/`);
+   unix = [/^foo$/, /^((?:[^\/]*(?:\/|$))*)$/, /^([^\/]*)\.md$/];
+   win = [];
+   matchSegments(t, 'foo/**/*.md', unix, win, {...opts, globstar:true});
 
-   res = globrex('foo/**/*.md', { ...opts, globstar:true });
-   t.equal(res.path.segments.join('  '), `/^foo$/  /^((?:[^\\/]*(?:\\/|$))*)$/  /^([^\\/]*)\\.md$/`);
-   //t.equal(`${res.regex}`, `/^foo\\/((?:[^\\/]*(?:\\/|$))*)([^\\/]*)\\.md$/`);
-
-   res = globrex('foo/:/b:az',  opts);
-   t.equal(res.path.segments.join('  '), `/^foo$/  /^:$/  /^b:az$/`);
-   //t.equal(`${res.regex}`, `/^foo\\/:\\/b:az$/`);
-
-   res = globrex('foo///baz.md', { ...opts, strict:true });
-   t.equal(res.path.segments.join('  '), `/^foo$/  /^baz\\.md$/`);
-   //t.equal(`${res.regex}`, `/^foo\\/\\/\\/baz\\.md$/`);
-
-   res = globrex('foo///baz.md', { ...opts, strict:false });
-   t.equal(res.path.segments.join('  '), `/^foo$/  /^baz\\.md$/`);
-   //t.equal(`${res.regex}`, `/^foo\\/?\\/?\\/baz\\.md$/`);
+   unix = [/^foo$/, /^:$/, /^b:az$/];
+   win = [];
+   matchSegments(t, 'foo/:/b:az', unix, win, opts);
+   
+   unix = [/^foo$/, /^baz\.md$/];
+   win = [];
+   matchSegments(t, 'foo///baz.md', unix, win, {...opts, strict:true});
+   
+   unix = [/^foo$/, /^baz\.md$/];
+   win = [];
+   matchSegments(t, 'foo///baz.md', unix, win, {...opts, strict:false});
    
    t.end();
 });
