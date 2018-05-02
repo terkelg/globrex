@@ -399,39 +399,39 @@ test('globrex: filepath path segments', t => {
    let opts = { extended:true }, res, win, unix;
 
    unix = [/^foo$/, /^bar$/, /^([^\/]*)$/, /^baz\.(md|js|txt)$/];
-   win = [];
+   win = [/^foo$/, /^bar$/, /^([^\\]*)$/, /^baz\.(md|js|txt)$/];
    matchSegments(t, 'foo/bar/*/baz.{md,js,txt}', unix, win, {...opts, globstar:true});
 
    unix = [/^foo$/, /^.*$/, /^baz\.md$/];
-   win = [];
+   win = [/^foo$/, /^.*$/, /^baz\.md$/];
    matchSegments(t, 'foo/*/baz.md', unix, win, opts);
    
    unix = [/^foo$/, /^.*$/, /^baz\.md$/];
-   win = [];
+   win = [/^foo$/, /^.*$/, /^baz\.md$/];
    matchSegments(t, 'foo/**/baz.md', unix, win, opts);
 
    unix = [/^foo$/, /^((?:[^\/]*(?:\/|$))*)$/, /^baz\.md$/];
-   win = [];
+   win = [/^foo$/, /^((?:[^\\]*(?:\\|$))*)$/, /^baz\.md$/];
    matchSegments(t, 'foo/**/baz.md', unix, win, {...opts, globstar:true});
 
    unix = [/^foo$/, /^.*$/, /^.*\.md$/];
-   win = [];
+   win = [/^foo$/, /^.*$/, /^.*\.md$/];
    matchSegments(t, 'foo/**/*.md', unix, win, opts);
 
    unix = [/^foo$/, /^((?:[^\/]*(?:\/|$))*)$/, /^([^\/]*)\.md$/];
-   win = [];
+   win = [/^foo$/, /^((?:[^\\]*(?:\\|$))*)$/, /^([^\\]*)\.md$/];
    matchSegments(t, 'foo/**/*.md', unix, win, {...opts, globstar:true});
 
    unix = [/^foo$/, /^:$/, /^b:az$/];
-   win = [];
+   win = [/^foo$/, /^:$/, /^b:az$/];
    matchSegments(t, 'foo/:/b:az', unix, win, opts);
    
    unix = [/^foo$/, /^baz\.md$/];
-   win = [];
+   win = [/^foo$/, /^baz\.md$/];
    matchSegments(t, 'foo///baz.md', unix, win, {...opts, strict:true});
    
    unix = [/^foo$/, /^baz\.md$/];
-   win = [];
+   win = [/^foo$/, /^baz\.md$/];
    matchSegments(t, 'foo///baz.md', unix, win, {...opts, strict:false});
    
    t.end();
