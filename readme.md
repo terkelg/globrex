@@ -55,7 +55,7 @@ result.regex.test('pluck'); // true
 ### globrex(glob, options)
 
 Type: `function`<br>
-Returns: `{ regex, string, segments }`
+Returns: `Object`
 
 Transform globs intp regular expressions.
 Returns object with the following properties:
@@ -69,25 +69,31 @@ JavaScript `RegExp` instance.
 > **Note**: Read more about how to use [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) on MDN.
 
 
-#### string
+#### path
 
-Type: `String`
+This property only exists if the option `filepath` is true.
 
-Regex string representation of the glob. 
+> **Note:** `filepath` is `false` by default
 
-#### segments
+#### path.segments
 
 Type: `Array`
 
 Array of `RegExp` instances seperated by `/`. 
-This can be usable when working with paths or urls. 
+This can be usable when working with file paths or urls. 
 
 Example array could be:
 ```js
 [ /^foo$/, /^bar$/, /^([^\/]*)$/, '^baz\\.(md|js|txt)$' ]
 ```
 
-> **Note**: This only makes sense for POSIX paths like /foo/bar/hello.js or URLs. Not globbing on regular strings.
+
+#### path.regex
+
+Type: `RegExp`
+
+JavaScript `RegExp` instance build for testign against paths.
+The regex have different path seperators depending on host OS.
 
 
 ### glob
@@ -106,7 +112,7 @@ Enable all advanced features from `extglob`.
 
 Matching so called "extended" globs pattern like single character matching, matching ranges of characters, group matching, etc.
 
-> **Note**: Interprets `[a-d]` as `[abcd]`.  To match a literal `-`, include it as first or last character.
+> **Note**: Interprets `[a-d]` as `[abcd]`. To match a literal `-`, include it as first or last character.
 
 
 ### options.globstar
@@ -144,11 +150,19 @@ RegExp flags (e.g. `'i'` ) to pass to the RegExp constructor.
 Type: `Boolean`<br>
 Default: `false`
 
-Parse input strings as it was a file path for additinal features.
-The returned object will have a `path` object added to the returned object:
+Parse input strings as it was a file path for special path related features. This feature only makes sense if the input is a POSIX path like `/foo/bar/hello.js` or URLs.
+
+When `true` the returned object will have an additional `path` object.
 
 - `segment`: Array containing a `RegExp` object for each path segment.
 - `regex`: OS specific file path `RegExp`. Path seperator used is based on the operating system.
+
+> **Note: Please only use forward-slashes in file path glob expressions**
+> Though windows uses either `/` or `\` as its path separator, only `/`
+> characters are used by this glob implementation.  You must use
+> forward-slashes **only** in glob expressions. Back-slashes will always
+> be interpreted as escape characters, not path separators.
+
 
 
 ## References

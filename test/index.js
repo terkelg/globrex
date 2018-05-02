@@ -2,8 +2,13 @@ const fs = require('fs');
 const test = require('tape');
 const globrex = require('../');
 const isWin = process.platform === 'win32';
+const GLOBSTAR = isWin ? '((?:[^\\\\]*(?:\\\\|$))*)' : '((?:[^\\/]*(?:\\/|$))*)';
 
-const g = (glob, str, opts) => globrex(glob, opts).regex.test(str);
+const g = (glob, str, opts) => {
+   let t = globrex(glob, opts);
+   console.log(glob, t);
+   return t.regex.test(str);
+}
 
 function match(t, pattern, ifUnix, ifWin, opts) {
    let res = globrex(pattern, opts);
@@ -351,7 +356,7 @@ test('globrex: strict', t => {
 
 test('globrex: filepath path-regex', t => {
    let opts = { extended:true, filepath:true };
-   let res;
+   let res, pattern;
 
    res = globrex('', opts);
    t.is(res.hasOwnProperty('path'), true);
@@ -359,21 +364,18 @@ test('globrex: filepath path-regex', t => {
    t.is(res.path.hasOwnProperty('segments'), true);
    t.is(Array.isArray(res.path.segments), true);
 
-   res = match(t, 'foo/bar/baz.js', '/^foo\\/bar\\/baz\\.js$/', '/^foo\\\\+bar\\\\+baz\\.js$/', opts);
-   t.is(`${res.regex}`, '/^foo\\/bar\\/baz\\.js$/');
+   pattern = 'foo/bar/baz.js';
+   res = match(t, pattern, '/^foo\\/bar\\/baz\\.js$/', '/^foo\\\\+bar\\\\+baz\\.js$/', opts);
    t.is(res.path.segments.length, 3);
 
-   res = match(t, '../foo/bar.js', '/^\\.\\.\\/foo\\/bar\\.js$/', '/^\\.\\.\\\\foo\\\\+bar\\.js$/', opts);
-   t.is(`${res.regex}`, '/^\\.\\.\\/foo\\/bar\\.js$/');
+   res = match(t, '../foo/bar.js', '/^\\.\\.\\/foo\\/bar\\.js$/', '/^\\.\\.\\\\+foo\\\\+bar\\.js$/', opts);
    t.is(res.path.segments.length, 3);
 
    res = match(t, '*/bar.js', '/^.*\\/bar\\.js$/', '/^.*\\\\+bar\\.js$/', opts);
-   t.is(`${res.regex}`, '/^.*\\/bar\\.js$/');
    t.is(res.path.segments.length, 2);
 
    opts.globstar = true;
    res = match(t, '**/bar.js', '/^((?:[^\\/]*(?:\\/|$))*)bar\\.js$/', '/^((?:[^\\\\]*(?:\\+/|$))*)bar\\.js$/', opts);
-   t.is(`${res.regex}`, '/^((?:[^\\/]*(?:\\/|$))*)bar\\.js$/');
    t.is(res.path.segments.length, 2);
 
    t.end(); 
