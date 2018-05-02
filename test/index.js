@@ -389,7 +389,7 @@ test('globrex: filepath path-regex', t => {
    t.is(res.path.segments.length, 2);
 
    opts.globstar = true;
-   res = matchRegex(t, '**/bar.js', '/^((?:[^\\/]*(?:\\/|$))*)bar\\.js$/', '/^((?:[^\\\\]*(?:\\\\+/|$))*)bar\\.js$/', opts);
+   res = matchRegex(t, '**/bar.js', '/^((?:[^\\/]*(?:\\/|$))*)bar\\.js$/', '/^((?:[^\\\\]*(?:\\\\+|$))*)bar\\.js$/', opts);
    t.is(res.path.segments.length, 2);
 
    t.end(); 
