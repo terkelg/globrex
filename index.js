@@ -27,12 +27,12 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
     const ext = [];
 
     // Helper function to build string and segments
-    const add = (str, split, addLastPart) => {
-        regex += str;
-        if (filepath) {
-            path.regex += str === '\\/' ? SEP_RGX : str;
+    function add(str, {split, last, only}={}) {
+        if (only !== 'path') regex += str;
+        if (filepath && only !== 'regex') {
+            path.regex += (str === '\\/' ? SEP_RGX : str);
             if (split) {
-                if (addLastPart) segment += str;
+                if (last) segment += str;
                 if (segment !== '') {
                     if (!flags.includes('g')) segment = `^${segment}$`; // change it 'includes'
                     path.segments.push(new RegExp(segment, flags));
@@ -50,12 +50,12 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
         n = glob[i + 1];
 
         if (['\\', '$', '^', '.', '='].includes(c)) {
-            add('\\' + c)
+            add(`\\${c}`);
             continue;
         }
 
         if (c === '/') {
-            add('\\' + c, true);
+            add(`\\${c}`, {split: true});
             if (n === '/' && !strict) regex += '?';
             continue;
         }
@@ -65,7 +65,7 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
                 add(c);
                 continue;
             }
-            add('\\' + c);
+            add(`\\${c}`);
             continue;
         }
 
@@ -82,7 +82,7 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
                 }
                 continue;
             }
-            add('\\' + c);
+            add(`\\${c}`);
             continue;
         }
         
@@ -91,7 +91,7 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
                 add(c);
                 continue;
             }
-            add('\\' + c);
+            add(`\\${c}`);
             continue;
         }
 
@@ -100,7 +100,7 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
                 ext.push(c);
                 continue;
             }
-            add('\\' + c);
+            add(`\\${c}`);
             continue;
         }
 
@@ -123,10 +123,10 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
                     i++;
                     continue;
                 }
-                add('\\' + c);
+                add(`\\${c}`);
                 continue;
             }
-            add('\\' + c);
+            add(`\\${c}`);
             continue;
         }
 
@@ -139,7 +139,7 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
                 }
                 continue;
             }
-            add('\\' + c);
+            add(`\\${c}`);
             continue;
         }
 
@@ -159,7 +159,7 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
                 add(c);
                 continue;
             }
-            add('\\'+c);
+            add(`\\${c}`);
             continue;
         }
 
@@ -169,7 +169,7 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
                 add(c);
                 continue;
             }
-            add('\\'+c);
+            add(`\\${c}`);
             continue;
         }
 
@@ -179,7 +179,7 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
                 add('(');
                 continue;
             }
-            add('\\'+c);
+            add(`\\${c}`);
             continue;
         }
 
@@ -189,7 +189,7 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
                 add(')');
                 continue;
             }
-            add('\\'+c);
+            add(`\\${c}`);
             continue;
         }
 
@@ -198,7 +198,7 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
                 add('|');
                 continue;
             }
-            add('\\' + c);
+            add(`\\${c}`);
             continue;
         }
 
@@ -227,11 +227,13 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
                     (nextChar === '/' || nextChar === undefined); // to the end of the segment
                 if (isGlobstar) {
                     // it's a globstar, so match zero or more path segments
-                    add(`((?:[^${SEP_ESC}]*(?:${SEP_ESC}|$))*)`, true, true)
+                    add(`((?:[^${SEP_ESC}]*(?:${SEP_ESC}|$))*)`, {only:'path', last:true, split:true});
+                    add(`((?:[^/]*(?:/|$))*)`, {only:'regex'});
                     i++; // move over the "/"
                 } else {
                     // it's not a globstar, so only match one path segment
-                    add(`([^${SEP_ESC}]*)`);
+                    add(`([^${SEP_ESC}]*)`, {only:'path'});
+                    add(`([^/]*)`, {only:'regex'});
                 }
             }
             continue;

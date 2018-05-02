@@ -11,7 +11,7 @@ function match(glob, strUnix, strWin, opts = {}) {
       strWin = false;
    }
    let res = globrex(glob, opts);
-   console.log(res);
+   console.log(res, strUnix);
    return res.regex.test(isWin && strWin ? strWin : strUnix);
 }
 
@@ -156,7 +156,7 @@ test('globrex: {} match a choice of different substrings', t => {
    t.equal(match('foo{bar,baaz}', 'foobaaz', { extended:true }), true);
    t.equal(match('foo{bar,baaz}', 'foobar', { extended:true }), true);
    t.equal(match('foo{bar,baaz}', 'foobuzz', { extended:true }), false);
-   t.equal(match('foo{bar,b*z}', 'foobuzz', { extended: true }), true);
+   t.equal(match('foo{bar,b*z}', 'foobuzz', { extended:true }), true);
 
    const tester = globstar => {
       t.equal(match('foo{bar,baaz}', 'foobaaz', { extended:true, globstar, flag:'g' }), true);
