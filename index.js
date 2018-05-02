@@ -13,7 +13,7 @@ const SEP_RGX = isWin ? '\\\\+' : '\\/';
  * @param {String} [opts.flags=''] RegExp globs
  * @returns {Object} converted object with string, segments and RegExp object
  */
-function globrex(glob, { extended = false, globstar = false, strict = false, filepath = false, flags = '' } = {}) {
+function globrex(glob, {extended = false, globstar = false, strict = false, filepath = false, flags = ''} = {}) {
     let regex = '';
     let segment = '';
     let path = { regex: '', segments: [] };

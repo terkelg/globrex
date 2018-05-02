@@ -139,12 +139,16 @@ Default: `''`
 RegExp flags (e.g. `'i'` ) to pass to the RegExp constructor.
 
 
-### options.windows
+### options.filepath
 
 Type: `Boolean`<br>
-Default: `System OS`
+Default: `false`
 
-Split segment as a windows path, otherwise splut as unix. Defaults to the OS running the package.
+Parse input strings as it was a file path for additinal features.
+The returned object will have a `path` object added to the returned object:
+
+- `segment`: Array containing a `RegExp` object for each path segment.
+- `regex`: OS specific file path `RegExp`. Path seperator used is based on the operating system.
 
 
 ## References
