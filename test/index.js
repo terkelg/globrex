@@ -8,8 +8,6 @@ const g = (glob, str, opts) => globrex(glob, opts).regex.test(str);
 function match(t, pattern, ifUnix, ifWin, opts) {
    let res = globrex(pattern, opts);
    let { regex } = (opts.filepath ? res.path : res);
-   console.log(res);
-   console.log(regex);
    t.is(regex.toString(), isWin ? ifWin : ifUnix, '~> regex matches expectant');
    return res;
 }
