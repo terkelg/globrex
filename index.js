@@ -34,7 +34,7 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
             if (split) {
                 if (addLastPart) segment += str;
                 if (segment !== '') {
-                    if (!flags || !~flags.indexOf('g')) segment = `^${segment}$`; // change it 'includes'
+                    if (!flags.includes('g')) segment = `^${segment}$`; // change it 'includes'
                     path.segments.push(new RegExp(segment, flags));
                 }
                 segment = '';
@@ -45,7 +45,7 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
     }
 
     let c, n;
-    for (var i = 0; i < glob.length; i++) {
+    for (let i = 0; i < glob.length; i++) {
         c = glob[i];
         n = glob[i + 1];
 
@@ -56,7 +56,7 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
 
         if (c === '/') {
             add('\\' + c, true);
-            if (n === '/' && !strict) regex += '?'; //TODO test with win
+            if (n === '/' && !strict) regex += '?';
             continue;
         }
 
@@ -89,23 +89,23 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
         if (c === '|') {
             if (ext.length) {
                 add(c);
-            } else {
-                add('\\' + c);
+                continue;
             }
+            add('\\' + c);
             continue;
         }
 
         if (c === '+') {
             if (n === '(' && extended) {
                 ext.push(c);
-            } else {
-                add('\\' + c);
+                continue;
             }
+            add('\\' + c);
             continue;
         }
 
-        if (c === '@') {
-            if (n === '(' && extended) {
+        if (c === '@' && extended) {
+            if (n === '(') {
                 ext.push(c);
                 continue;
             }
@@ -126,14 +126,20 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
                 add('\\' + c);
                 continue;
             }
+            add('\\' + c);
+            continue;
         }
 
-        if (c === '?' && extended) {
-            if (n === '(') {
-                ext.push(c);
-            } else {
-                add('.');
+        if (c === '?') {
+            if (extended) {
+                if (n === '(') {
+                    ext.push(c);
+                } else {
+                    add('.');
+                }
+                continue;
             }
+            add('\\' + c);
             continue;
         }
 
@@ -153,6 +159,8 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
                 add(c);
                 continue;
             }
+            add('\\'+c);
+            continue;
         }
 
         if (c === ']') {
@@ -161,6 +169,8 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
                 add(c);
                 continue;
             }
+            add('\\'+c);
+            continue;
         }
 
         if (c === '{') {
@@ -169,6 +179,8 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
                 add('(');
                 continue;
             }
+            add('\\'+c);
+            continue;
         }
 
         if (c === '}') {
@@ -177,6 +189,8 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
                 add(')');
                 continue;
             }
+            add('\\'+c);
+            continue;
         }
 
         if (c === ',') {
@@ -223,30 +237,28 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
             continue;
         }
 
-        if (c === '?') {
-            add('\\?')
-            console.log(glob);
-            continue;
-        }
-
         add(c);
     }
 
+
     // When regexp 'g' flag is specified don't
     // constrain the regular expression with ^ & $
-    if (!flags || !~flags.indexOf('g')) {
+    if (!flags.includes('g')) {
         regex = `^${regex}$`;
         segment = `^${segment}$`;
         if (filepath) path.regex = `^${path.regex}$`;
     }
 
+    const result = { regex: new RegExp(regex, flags) };
+
     // Push the last segment
     if (filepath) {
         path.segments.push(new RegExp(segment, flags));
         path.regex = new RegExp(path.regex, flags);
+        result.path = path;
     }
 
-    return { regex: new RegExp(regex, flags), path };
+    return result;
 }
 
 module.exports = globrex;

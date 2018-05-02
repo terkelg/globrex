@@ -18,7 +18,6 @@ test('globrex: standard', t => {
    t.equal(typeof globrex, 'function', 'consturctor is a typeof function');
    t.equal(res instanceof Object, true, 'returns object');
    t.equal(res.regex.toString(), '/^.*\\.js$/', 'returns regex object');
-   //t.equal(Array.isArray(res.segments), true, 'returns array of segments');
 });
 
 test('globrex: Standard * matching', t => {
@@ -37,7 +36,7 @@ test('globrex: Standard * matching', t => {
    t.equal(g('f*uck', 'firetruck', { flags:'g' }), true, 'match the middle');
 
    t.equal(g('uc', 'firetruck'), false, 'do not match without g');
-   t.equal(g('uc', 'firetruck'), false, 'match anywhere with RegExp "g"');
+   t.equal(g('uc', 'firetruck', { flags:'g' }), true, 'match anywhere with RegExp "g"');
 
    t.equal(g('f*uck', 'fuck'), true, 'match zero characters');
    t.equal(g('f*uck', 'fuck', { flags:'g' }), true, 'match zero characters');
@@ -352,12 +351,30 @@ test('globrex: strict', t => {
 
 test('globrex: filepath path-regex', t => {
    let opts = { extended:true, filepath:true };
+   let res;
 
-   let res = match(t, 'foo/bar/baz.js', '/^foo\\/bar\\/baz\\.js$/', '/^foo\\\\+bar\\\\+baz\\.js$/', opts);
+   res = globrex('', opts);
+   t.is(res.hasOwnProperty('path'), true);
+   t.is(res.path.hasOwnProperty('regex'), true);
+   t.is(res.path.hasOwnProperty('segments'), true);
+   t.is(Array.isArray(res.path.segments), true);
+
+   res = match(t, 'foo/bar/baz.js', '/^foo\\/bar\\/baz\\.js$/', '/^foo\\\\+bar\\\\+baz\\.js$/', opts);
    t.is(`${res.regex}`, '/^foo\\/bar\\/baz\\.js$/');
+   t.is(res.path.segments.length, 3);
 
-   // TEST STAR PATTERN
-   // UPDATE README
+   res = match(t, '../foo/bar.js', '/^\\.\\.\\/foo\\/bar\\.js$/', '/^\\.\\.\\\\foo\\\\+bar\\.js$/', opts);
+   t.is(`${res.regex}`, '/^\\.\\.\\/foo\\/bar\\.js$/');
+   t.is(res.path.segments.length, 3);
+
+   res = match(t, '*/bar.js', '/^.*\\/bar\\.js$/', '/^.*\\\\+bar\\.js$/', opts);
+   t.is(`${res.regex}`, '/^.*\\/bar\\.js$/');
+   t.is(res.path.segments.length, 2);
+
+   opts.globstar = true;
+   res = match(t, '**/bar.js', '/^((?:[^\\/]*(?:\\/|$))*)bar\\.js$/', '/^((?:[^\\\\]*(?:\\+/|$))*)bar\\.js$/', opts);
+   t.is(`${res.regex}`, '/^((?:[^\\/]*(?:\\/|$))*)bar\\.js$/');
+   t.is(res.path.segments.length, 2);
 
    t.end(); 
 })
@@ -403,39 +420,6 @@ test('globrex: filepath path segments', t => {
    
    t.end();
 });
-
-/*
-test('globrex: path segments option windows', t => {
-    t.plan(15);
-
-    const res1 = globrex(`C:\\Users\\foo\\bar\\baz`, { windows:true });
-    t.equal(res1.segments.join('  '), `/^C:$/  /^Users$/  /^foo$/  /^bar$/  /^baz$/`);
-    t.equal(`${res1.regex}`, `/^C:\\\\Users\\\\foo\\\\bar\\\\baz$/`);
-    t.equal(res1.regex.test(`C:\\Users\\foo\\bar\\baz`), true);
-
-    const res2 = globrex(`Users\\foo\\bar\\baz`, { windows:true });
-    t.equal(res2.segments.join('  '), `/^Users$/  /^foo$/  /^bar$/  /^baz$/`);
-    t.equal(`${res2.regex}`, `/^Users\\\\foo\\\\bar\\\\baz$/`);
-
-    const res3 = globrex(`Users\\foo\\bar.{md,js}`, { windows:true, extended:true });
-    t.equal(res3.segments.join('  '), `/^Users$/  /^foo$/  /^bar\\.(md|js)$/`);
-    t.equal(`${res3.regex}`, `/^Users\\\\foo\\\\bar\\.(md|js)$/`);
-    t.equal(res3.regex.test(`Users\\foo\\bar.js`), true);
-    t.equal(res3.regex.test(`Users\\foo\\bar.mp3`), false);
-
-    const res4 = globrex(`Users\\\\foo\\bar.{md,js}`, { windows:true, extended:true, strict:false });
-    t.equal(res4.segments.join('  '), `/^Users$/  /^foo$/  /^bar\\.(md|js)$/`);
-    t.equal(`${res4.regex}`, `/^Users\\\\?\\\\foo\\\\bar\\.(md|js)$/`);
-
-    const res5 = globrex(`Users\\\\foo\\bar.{md,js}`, { windows:true, extended:true, strict:true });
-    t.equal(res5.segments.join('  '), `/^Users$/  /^foo$/  /^bar\\.(md|js)$/`);
-    t.equal(`${res5.regex}`, `/^Users\\\\\\\\foo\\\\bar\\.(md|js)$/`);
-
-    const res6 = globrex(`/Users\\\\foo\\bar.{md,js}`, { windows:true, extended:true });
-    t.equal(res6.segments.join('  '), `/^\\/Users$/  /^foo$/  /^bar\\.(md|js)$/`);
-    t.equal(`${res6.regex}`, `/^\\/Users\\\\?\\\\foo\\\\bar\\.(md|js)$/`);
-});
-*/
 
 test('globrex: stress testing', t => {
    t.plan(8);
