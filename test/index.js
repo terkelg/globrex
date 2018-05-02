@@ -4,13 +4,14 @@ const globrex = require('../');
 const isWin = process.platform === 'win32';
 const GLOBSTAR = isWin ? '((?:[^\\\\]*(?:\\\\|$))*)' : '((?:[^\\/]*(?:\\/|$))*)';
 
+// TODO: Rewrite tests match(t, { unix, win, expect, opts})
 function match(glob, strUnix, strWin, opts = {}) {
    if (typeof strWin === 'object') {
       opts = strWin;
       strWin = false;
    }
    let res = globrex(glob, opts);
-   console.log(glob);
+   console.log(res);
    return res.regex.test(isWin && strWin ? strWin : strUnix);
 }
 
