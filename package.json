@@ -1,7 +1,7 @@
 {
   "name": "globrex",
   "version": "0.0.3",
-  "description": "Glob to regex",
+  "description": "Glob to regular expression with support for extended globs",
   "main": "src/index.js",
   "author": "Terkel Gjervig",
   "license": "MIT",
@@ -10,7 +10,7 @@
     "url": "https://github.com/terkelg/globrex"
   },
   "files": [
-    "src"
+    "index.js"
   ],
   "keywords": [
     "glob",
