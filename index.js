@@ -227,7 +227,7 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
                     (nextChar === '/' || nextChar === undefined); // to the end of the segment
                 if (isGlobstar) {
                     // it's a globstar, so match zero or more path segments
-                    add(`((?:[^${SEP_ESC}]*(?:${SEP_RGX}|$))*)`, {only:'path', last:true, split:true});
+                    add(`((?:[^${SEP_ESC}]*(?:${SEP_ESC}|$))*)`, {only:'path', last:true, split:true});
                     add(`((?:[^/]*(?:/|$))*)`, {only:'regex'});
                     i++; // move over the "/"
                 } else {
