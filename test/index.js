@@ -341,7 +341,7 @@ test('globrex: filepath path-regex', t => {
    t.is(res.path.segments.length, 2);
 
    opts.globstar = true;
-   res = matchRegex(t, '**/bar.js', '/^((?:[^\\/]*(?:\\/|$))*)bar\\.js$/', '/^((?:[^\\\\]*(?:\\\\+|$))*)bar\\.js$/', opts);
+   res = matchRegex(t, '**/bar.js', '/^((?:[^\\/]*(?:\\/|$))*)bar\\.js$/', '/^((?:[^\\\\]*(?:\\\\|$))*)bar\\.js$/', opts);
    t.is(res.path.segments.length, 2);
 
    t.end(); 
@@ -363,7 +363,7 @@ test('globrex: filepath path segments', t => {
    matchSegments(t, 'foo/**/baz.md', unix, win, opts);
 
    unix = [/^foo$/, /^((?:[^\/]*(?:\/|$))*)$/, /^baz\.md$/];
-   win = [/^foo$/, /^((?:[^\\]*(?:\\+|$))*)$/, /^baz\.md$/];
+   win = [/^foo$/, /^((?:[^\\]*(?:\\|$))*)$/, /^baz\.md$/];
    matchSegments(t, 'foo/**/baz.md', unix, win, {...opts, globstar:true});
 
    unix = [/^foo$/, /^.*$/, /^.*\.md$/];
@@ -371,7 +371,7 @@ test('globrex: filepath path segments', t => {
    matchSegments(t, 'foo/**/*.md', unix, win, opts);
 
    unix = [/^foo$/, /^((?:[^\/]*(?:\/|$))*)$/, /^([^\/]*)\.md$/];
-   win = [/^foo$/, /^((?:[^\\]*(?:\\+|$))*)$/, /^([^\\]*)\.md$/];
+   win = [/^foo$/, /^((?:[^\\]*(?:\\|$))*)$/, /^([^\\]*)\.md$/];
    matchSegments(t, 'foo/**/*.md', unix, win, {...opts, globstar:true});
 
    unix = [/^foo$/, /^:$/, /^b:az$/];
