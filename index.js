@@ -1,6 +1,10 @@
 const isWin = process.platform === 'win32';
-const SEP_ESC = isWin ? '\\\\' : '/';
-const SEP_RGX = isWin ? '\\\\+' : '\\/';
+const SEP = isWin ? `\\\\+` : `\\/`;
+const SEP_ESC = isWin ? `\\\\` : `/`;
+const GLOBSTAR = `((?:[^/]*(?:/|$))*)`;
+const WILDCARD = `([^/]*)`;
+const GLOBSTAR_SEGMENT = `((?:[^${SEP_ESC}]*(?:${SEP_ESC}|$))*)`;
+const WILDCARD_SEGMENT = `([^${SEP_ESC}]*)`;
 
 /**
  * Convert any glob pattern to a JavaScript Regexp object
@@ -30,7 +34,7 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
     function add(str, {split, last, only}={}) {
         if (only !== 'path') regex += str;
         if (filepath && only !== 'regex') {
-            path.regex += (str === '\\/' ? SEP_RGX : str);
+            path.regex += (str === '\\/' ? SEP : str);
             if (split) {
                 if (last) segment += str;
                 if (segment !== '') {
@@ -227,13 +231,13 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
                     (nextChar === '/' || nextChar === undefined); // to the end of the segment
                 if (isGlobstar) {
                     // it's a globstar, so match zero or more path segments
-                    add(`((?:[^${SEP_ESC}]*(?:${SEP_ESC}|$))*)`, {only:'path', last:true, split:true});
-                    add(`((?:[^/]*(?:/|$))*)`, {only:'regex'});
+                    add(GLOBSTAR, {only:'regex'});
+                    add(GLOBSTAR_SEGMENT, {only:'path', last:true, split:true});
                     i++; // move over the "/"
                 } else {
                     // it's not a globstar, so only match one path segment
-                    add(`([^${SEP_ESC}]*)`, {only:'path'});
-                    add(`([^/]*)`, {only:'regex'});
+                    add(WILDCARD, {only:'regex'});
+                    add(WILDCARD_SEGMENT, {only:'path'});
                 }
             }
             continue;
@@ -257,6 +261,7 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
     if (filepath) {
         path.segments.push(new RegExp(segment, flags));
         path.regex = new RegExp(path.regex, flags);
+        path.globstar = GLOBSTAR_SEGMENT;
         result.path = path;
     }
 
