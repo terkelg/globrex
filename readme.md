@@ -157,6 +157,7 @@ When `true` the returned object will have an additional `path` object.
 
 - `segment`: Array containing a `RegExp` object for each path segment.
 - `regex`: OS specific file path `RegExp`. Path seperator used is based on the operating system.
+- `globstar`: Regex string used to test for globstars.
 
 > **Note: Please only use forward-slashes in file path glob expressions**
 > Though windows uses either `/` or `\` as its path separator, only `/`
