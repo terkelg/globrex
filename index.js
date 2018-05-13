@@ -255,7 +255,7 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
         if (filepath) path.regex = `^${path.regex}$`;
     }
 
-    const result = { regex: new RegExp(regex, flags) };
+    const result = {regex: new RegExp(regex, flags)};
 
     // Push the last segment
     if (filepath) {
