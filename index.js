@@ -261,7 +261,7 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
     if (filepath) {
         path.segments.push(new RegExp(segment, flags));
         path.regex = new RegExp(path.regex, flags);
-        path.globstar = GLOBSTAR_SEGMENT;
+        path.globstar = new RegExp(!flags.includes('g') ? `^${GLOBSTAR_SEGMENT}$` : GLOBSTAR_SEGMENT, flags);
         result.path = path;
     }
 
