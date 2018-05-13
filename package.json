@@ -1,6 +1,6 @@
 {
   "name": "globrex",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Glob to regular expression with support for extended globs",
   "main": "src/index.js",
   "author": "Terkel Gjervig",
