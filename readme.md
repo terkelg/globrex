@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/terkelg/globrex/raw/master/globrex.png" alt="globrex" width="500" height="200" />
+  <img src="https://github.com/terkelg/globrex/raw/master/globrex.png" alt="globrex" width="500" />
 </div>
 
 <h1 align="center">globrex</h1>
