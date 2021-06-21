@@ -57,7 +57,7 @@ result.regex.test('pluck'); // true
 Type: `function`<br>
 Returns: `Object`
 
-Transform globs intp regular expressions.
+Transform globs into regular expressions.
 Returns object with the following properties:
 
 
