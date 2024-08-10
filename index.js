@@ -1,4 +1,9 @@
-const isWin = process.platform === 'win32';
+let isWin;
+try {
+    isWin = process.platform === 'win32';
+} catch (err) {
+    isWin = false
+}
 const SEP = isWin ? `\\\\+` : `\\/`;
 const SEP_ESC = isWin ? `\\\\` : `/`;
 const GLOBSTAR = `((?:[^/]*(?:/|$))*)`;
