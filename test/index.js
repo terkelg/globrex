@@ -112,6 +112,19 @@ test('globrex: [] extended character ranges', t => {
    t.equal(match('[[:digit:]b]/bar.txt', 'a/bar.txt', { extended:true }), false);
 });
 
+test('globrex: alnum ranges exclude punctuation', t => {
+   t.plan(21);
+   const result = globrex('[[:alnum:]]', { extended:true, filepath:true });
+   const negated = globrex('[![:alnum:]]', { extended:true, filepath:true });
+   [result.regex, result.path.regex, result.path.segments[0]].forEach(regex => {
+      ['_', '|', '(', ')'].forEach(value => t.equal(regex.test(value), false));
+      ['A', '5'].forEach(value => t.equal(regex.test(value), true));
+   });
+   [negated.regex, negated.path.regex, negated.path.segments[0]].forEach(regex => {
+      t.equal(regex.test('_'), true);
+   });
+});
+
 test('globrex: {} match a choice of different substrings', t => {
    t.plan(12);
    t.equal(match('foo{bar,baaz}', 'foobaaz', { extended:true }), true);

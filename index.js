@@ -157,7 +157,7 @@ function globrex(glob, {extended = false, globstar = false, strict = false, file
                 i++; // skip [
                 let value = '';
                 while(glob[++i] !== ':') value += glob[i];
-                if (value === 'alnum') add('(\\w|\\d)');
+                if (value === 'alnum') add('a-zA-Z0-9');
                 else if (value === 'space') add('\\s');
                 else if (value === 'digit') add('\\d');
                 i++; // skip last ]
