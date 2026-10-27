@@ -1,7 +1,23 @@
 const fs = require('fs');
 const test = require('tape');
 const globrex = require('../');
+const { spawnSync } = require('child_process');
 const {match, matchRegex, matchSegments} = require('./helpers');
+
+test('globrex: unterminated POSIX classes do not hang', t => {
+   const script = `
+      const assert = require('assert');
+      const globrex = require(${JSON.stringify(require.resolve('../'))});
+      for (const pattern of ['[[:', '[[:digit]]']) {
+         for (const filepath of [false, true]) {
+            assert.throws(() => globrex(pattern, { extended:true, filepath }), SyntaxError);
+         }
+      }
+   `;
+   const result = spawnSync(process.execPath, ['-e', script], { timeout:2000 });
+   t.equal(result.status, 0, 'rejects malformed classes without an unbounded scan');
+   t.end();
+});
 
 test('globrex: standard', t => {
    t.plan(3);
